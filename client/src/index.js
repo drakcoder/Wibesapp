@@ -11,6 +11,7 @@ import Register from './components/register';
 import Main from './components/main';
 import People from './components/people';
 import CreatePost from './components/createPost';
+import Home from './components/home';
 
 ReactDOM.render(
     <React.StrictMode>
@@ -19,7 +20,7 @@ ReactDOM.render(
                 <Routes>
                     <Route path="/" element={<App />}>
                         <Route index path="/" element={<Main></Main>} />
-                        <Route index path="home" element={<h1>Home</h1>} />
+                        <Route index path="home" element={<Home></Home>} />
                         <Route path="people" element={<People />} />
                         <Route path='login' element={<Login></Login>}></Route>
                         <Route path='createPost' element={<CreatePost></CreatePost>}></Route>

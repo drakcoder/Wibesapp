@@ -6,7 +6,7 @@ import Cookies from 'js-cookie';
 
 const removeCookie = () => {
     Cookies.remove('token', { path: '' });
-    window.location.replace('/home');
+    window.location.replace('/');
 };
 
 function NavBar() {
@@ -38,7 +38,6 @@ function NavBar() {
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="mb-auto">
-                            <Nav.Link><Link to="/home" className='nav-link'>Home</Link></Nav.Link>
                             <Nav.Link><Link to="/people" className='nav-link'>People</Link></Nav.Link>
                         </Nav>
                     </Navbar.Collapse>

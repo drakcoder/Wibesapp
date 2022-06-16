@@ -47,6 +47,17 @@ const getAllUsers = async () => {
     // return result.records[0]._fields;
 };
 
+const getAllPosts = async () => {
+    const query = `MATCH (p:Post) RETURN p`;
+    console.log(query);
+    const result = await session.run(query);
+    let posts = [];
+    for (r of result.records) {
+        posts.push(r._fields[0]);
+    }
+    return posts;
+};
+
 const _createPost = async (email, title, description) => {
     const query = `MATCH (u:User) WHERE u.email="${email}" MERGE (p:Post {title:"${title}",description:"${description}"}) MERGE (u)-[:POSTED]->(p)`;
     console.log(query);
@@ -64,5 +75,6 @@ module.exports = {
     createUser,
     findUser,
     getAllUsers,
+    getAllPosts,
     _createPost
 };
