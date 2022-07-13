@@ -23,7 +23,7 @@ function People() {
     // people.push(<User title={u.properties.name} text="test" className='mb-3'></User>);
     return (
         <Container>
-            {users.map((u) => (<User title={u.properties.name} text="test" className='mb-3'></User>))}
+            {users.map((u, i) => (<User title={u.properties.name} text="test" id={i} className='mb-3' ></User>))}
         </Container>
     );
 }

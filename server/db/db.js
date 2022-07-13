@@ -1,6 +1,7 @@
 const neo4j = require('neo4j-driver');
 require('dotenv').config();
 const bcrypt = require('bcrypt');
+const { v4: uuidv4 } = require('uuid');
 
 const uri = 'neo4j+s://88e3638e.databases.neo4j.io';
 const user = process.env.NEO4J_USERNAME;
@@ -10,7 +11,8 @@ const driver = neo4j.driver(uri, neo4j.auth.basic(user, password));
 const session = driver.session();
 
 const createUser = async (name, email, password) => {
-    const query = `MERGE (u:User { name:"${name}",email:"${email}",password:"${password}"})`;
+    const uid = uuidv4();
+    const query = `MERGE (u:User { uid:"${uid}",name:"${name}",email:"${email}",password:"${password}"})`;
     console.log(query);
     const writeResult = await session.writeTransaction(tx => {
         tx.run(query);
@@ -47,8 +49,8 @@ const getAllUsers = async () => {
     // return result.records[0]._fields;
 };
 
-const getAllPosts = async () => {
-    const query = `MATCH (p:Post) RETURN p`;
+const getAllPosts = async (user) => {
+    const query = `MATCH (u:User) WHERE u.email="${user.email}" MATCH (p:Post) WHERE NOT (p)<-[:RESPONDED]-(u) RETURN p`;
     console.log(query);
     const result = await session.run(query);
     let posts = [];
@@ -59,13 +61,43 @@ const getAllPosts = async () => {
 };
 
 const _createPost = async (email, title, description) => {
-    const query = `MATCH (u:User) WHERE u.email="${email}" MERGE (p:Post {title:"${title}",description:"${description}"}) MERGE (u)-[:POSTED]->(p)`;
+    const uid = uuidv4();
+    const query = `MATCH (u:User) WHERE u.email="${email}" MERGE (p:Post {uid:"${uid}",title:"${title}",description:"${description}",likes : 0 ,ignores : 0 ,dislikes : 0}) MERGE (u)-[:POSTED]->(p)`;
     console.log(query);
     try {
         await session.run(query);
-        return true;
+        return { status: true, postId: uid };
     }
     catch (err) {
+        console.log(err);
+        return false;
+    }
+};
+
+const _updatePost = async (user, post, action) => {
+    let query;
+    if (action == 'like') {
+        query = `MATCH (u:User) WHERE u.email="${user.email}" MATCH (p:Post) WHERE p.uid="${post}" SET p.likes=p.likes+1 MERGE (u)-[:RESPONDED]->(p) RETURN p`;
+    }
+    if (action == 'dislike') {
+        query = `MATCH (u:User) WHERE u.email="${user.email}" MATCH (p:Post) WHERE p.uid="${post}" SET p.dislikes=p.dislikes+1 MERGE (u)-[:RESPONDED]->(p) RETURN p`;
+    }
+    console.log(query);
+    try {
+        let updatedPost = await session.run(query);
+        return { success: true, post: updatedPost.records[0]._fields[0] };
+    } catch (error) {
+        console.log(error);
+        return false;
+    }
+};
+
+const deletePost = async (uid) => {
+    let query = `MATCH (p:Post) WHERE p.uid="${uid}" DETACH DELETE p`;
+    try {
+        await session.run(query);
+        return true;
+    } catch (err) {
         console.log(err);
         return false;
     }
@@ -76,5 +108,7 @@ module.exports = {
     findUser,
     getAllUsers,
     getAllPosts,
-    _createPost
+    _createPost,
+    _updatePost,
+    deletePost
 };

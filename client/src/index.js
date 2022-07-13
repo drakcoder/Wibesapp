@@ -12,10 +12,13 @@ import Main from './components/main';
 import People from './components/people';
 import CreatePost from './components/createPost';
 import Home from './components/home';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 ReactDOM.render(
     <React.StrictMode>
         <Provider store={store}>
+            <ToastContainer autoClose={5000} />
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<App />}>

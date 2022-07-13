@@ -2,6 +2,8 @@ import React from 'react';
 import { Container } from 'react-bootstrap';
 import Cookies from 'js-cookie';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const createPost = async () => {
     const title = document.getElementById('title').value;
@@ -10,8 +12,10 @@ const createPost = async () => {
     console.log(token);
     const status = await axios.post("http://localhost:8000/createPost", { title, description, token });
     if (status) {
-        window.location.replace('/home');
-        alert("post created");
+        await toast("Post Created!", { autoClose: 5000 });
+        setTimeout(() => {
+            window.location.replace('/home');
+        }, 5000);
         return;
     }
     alert("an error occured");
@@ -20,6 +24,7 @@ const createPost = async () => {
 function CreatePost() {
     return (
         <Container>
+            <ToastContainer />
             <div className="card" style={{ "width": "100%" }}>
                 <div className="card-body">
                     <label>Title of Post: </label>

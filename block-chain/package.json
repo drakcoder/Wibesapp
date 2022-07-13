@@ -1,5 +1,5 @@
 {
-  "name": "server",
+  "name": "block-chain",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,15 +10,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "agenda": "^4.3.0",
     "axios": "^0.27.2",
-    "bcrypt": "^5.0.1",
-    "cookie-parser": "^1.4.6",
+    "big-number": "^2.0.0",
     "cors": "^2.8.5",
-    "dotenv": "^16.0.1",
+    "crypto": "^1.0.1",
     "express": "^4.18.1",
-    "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.4.4",
-    "neo4j-driver": "^4.4.6",
-    "uuid": "^8.3.2"
+    "sha256": "^0.2.0",
+    "shortid": "^2.2.16"
   }
 }

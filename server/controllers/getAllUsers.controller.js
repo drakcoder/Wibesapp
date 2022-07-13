@@ -1,4 +1,5 @@
 const { getAllUsers, getAllPosts } = require('../db/db');
+const jwt = require('jsonwebtoken');
 
 const getUsers = async (req, res, next) => {
     const users = await getAllUsers();
@@ -7,7 +8,9 @@ const getUsers = async (req, res, next) => {
 };
 
 const getPosts = async (req, res, next) => {
-    const posts = await getAllPosts();
+    const token = req.headers.token;
+    const result = await jwt.verify(token, process.env.TOKEN_SECRET);
+    const posts = await getAllPosts(result);
     console.log(posts);
     return res.send({ posts });
 };

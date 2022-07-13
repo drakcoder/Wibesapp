@@ -2,21 +2,23 @@ import React, { useEffect, useState } from 'react';
 import { Container } from 'react-bootstrap';
 import Post from './post';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 var curr = 0;
 
 function Home() {
     const [posts, setPosts] = useState([]);
+    const fetchPosts = async () => {
+        try {
+            const token = Cookies.get('token');
+            const { data } = await axios.get('http://localhost:8000/getAllPosts', { headers: { token: token } });
+            console.log(data);
+            setPosts(data.posts);
+        } catch (error) {
+            console.error(error);
+        }
+    };
     useEffect(() => {
-        const fetchPosts = async () => {
-            try {
-                const { data } = await axios.get('http://localhost:8000/getAllPosts');
-                console.log(data);
-                setPosts(data.posts);
-            } catch (error) {
-                console.error(error);
-            }
-        };
         fetchPosts();
     }, []);
     const [post, setPost] = useState(posts[curr]);
@@ -24,6 +26,30 @@ function Home() {
         curr++;
         setPost(posts[curr]);
         console.log(curr);
+    };
+    const likePost = async (uid) => {
+        console.log(uid);
+        const token = Cookies.get('token');
+        console.log(token);
+        const status = await axios.patch("http://localhost:8000/updatePost", { uid, token, action: 'like' });
+        if (status) {
+            curr++;
+            setPost(posts[curr]);
+        } else {
+            alert("An error occurred");
+        }
+    };
+    const dislikePost = async (uid) => {
+        console.log(uid);
+        const token = Cookies.get('token');
+        console.log(token);
+        const status = await axios.patch("http://localhost:8000/updatePost", { uid, token, action: 'dislike' });
+        if (status) {
+            curr++;
+            setPost(posts[curr]);
+        } else {
+            alert("An error occurred");
+        }
     };
     return (
         <Container>
@@ -33,7 +59,7 @@ function Home() {
                     <Container className='card text-center' style={{ "width": "100%" }}>
                         <div className='card-body'>
                             <button class="btn btn-primary btn-sm float-left"
-                                id="left" >
+                                id="left" onClick={() => dislikePost(post.properties.uid)} >
                                 Left
                             </button>
 
@@ -43,7 +69,7 @@ function Home() {
                             </button>
 
                             <button class="btn btn-danger btn-sm float-right"
-                                id="right" >
+                                id="right" onClick={() => likePost(post.properties.uid)} >
                                 Right
                             </button>
                         </div>
@@ -51,7 +77,7 @@ function Home() {
                 </div>
             )
                 : (
-                    <button onClick={() => { curr = -1; nextPost(); }}>Click here to get posts</button>
+                    <button onClick={async () => { curr = -1; await fetchPosts(); nextPost(); }}>Click here to get posts</button>
                 )
             }
         </Container>
